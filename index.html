@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Javeria! 🎉 | From Malika</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        /* Animated background particles */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
+        }
+        .floating-balloon {
+            position: fixed;
+            bottom: -100px;
+            animation: floatUp 12s linear infinite;
+            cursor: pointer;
+            z-index: 20;
+            user-select: none;
+        }
+
+        /* Glassmorphism card effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 40px rgba(244, 143, 177, 0.3);
+        }
+
+        /* Canvas scratch card styling */
+        #scratch-canvas {
+            touch-action: none;
+            cursor: crosshair;
+        }
+
+        /* Custom print formatting for Certificate */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-certificate, #printable-certificate * {
+                visibility: visible;
+            }
+            #printable-certificate {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 20px;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800 relative select-none">
+
+    <div id="balloon-container" class="fixed inset-0 pointer-events-auto z-10 overflow-hidden"></div>
+
+    <!-- Music Control Banner -->
+    <div class="fixed top-4 right-4 z-50 flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-pink-300">
+        <button id="music-toggle-btn" class="text-pink-600 hover:text-pink-700 text-xl focus:outline-none flex items-center gap-2">
+            <i id="music-icon" class="fas fa-music animate-spin" style="animation-duration: 3s;"></i>
+            <span id="music-text" class="text-xs font-semibold">Playing Birthday Song 🎵</span>
+        </button>
+    </div>
+
+    <!-- PIN Lock Overlay -->
+    <div id="pin-screen" class="fixed inset-0 bg-pink-600/90 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full p-8 rounded-3xl text-center shadow-2xl border border-white/50">
+            <div class="w-20 h-20 bg-pink-100 text-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Secret Lock Screen 🔐</h2>
+            <p class="text-sm text-gray-600 mb-6">Enter Secret Passcode (Hint: 0710)</p>
+            
+            <div class="flex justify-center gap-3 mb-6">
+                <input type="password" maxlength="4" id="pin-input" readonly placeholder="• • • •" class="text-center text-3xl tracking-widest font-bold w-48 py-3 bg-white/80 border-2 border-pink-300 rounded-xl focus:outline-none focus:border-pink-500 text-pink-600 shadow-inner">
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 max-w-xs mx-auto mb-4">
+                <button onclick="appendPin('1')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">1</button>
+                <button onclick="appendPin('2')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">2</button>
+                <button onclick="appendPin('3')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">3</button>
+                <button onclick="appendPin('4')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">4</button>
+                <button onclick="appendPin('5')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">5</button>
+                <button onclick="appendPin('6')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">6</button>
+                <button onclick="appendPin('7')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">7</button>
+                <button onclick="appendPin('8')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">8</button>
+                <button onclick="appendPin('9')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">9</button>
+                <button onclick="clearPin()" class="py-3 bg-red-100 text-red-600 font-bold rounded-xl shadow hover:bg-red-200 active:scale-95 text-sm">Clear</button>
+                <button onclick="appendPin('0')" class="py-3 bg-white/90 font-bold rounded-xl shadow hover:bg-pink-100 active:scale-95 text-lg">0</button>
+                <button onclick="verifyPin()" class="py-3 bg-pink-500 text-white font-bold rounded-xl shadow hover:bg-pink-600 active:scale-95 text-sm">OK</button>
+            </div>
+            <p id="pin-error" class="text-red-500 text-xs font-semibold hidden">Incorrect Code! Hint: 0710</p>
+        </div>
+    </div>
+
+    <!-- Main Interactive Website Content -->
+    <div id="main-content" class="min-h-screen py-12 px-4 sm:px-6 max-w-4xl mx-auto hidden relative z-20">
+        
+        <!-- Header Section -->
+        <header class="text-center mb-10">
+            <span class="px-4 py-1.5 bg-pink-200/80 text-pink-700 rounded-full text-xs font-bold tracking-wider uppercase inline-block mb-3 shadow-sm">Special Surprise For My Bestie</span>
+            <h1 class="text-4xl sm:text-6xl font-bold text-pink-600 font-handwriting mb-2">Happy Birthday Javeria! 🎂✨</h1>
+            <p class="text-gray-600 font-medium text-sm sm:text-base">Created with lots of love by your forever bestie <span class="text-pink-600 font-bold">Malika</span> 💖</p>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="flex justify-center flex-wrap gap-2 mb-8 glass-card p-2 rounded-2xl shadow-md">
+            <button onclick="switchTab('hug-sec')" class="tab-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all bg-pink-500 text-white shadow">🤗 Virtual Hug</button>
+            <button onclick="switchTab('scratch-sec')" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all hover:bg-pink-100 text-gray-700">🎁 Scratch Card</button>
+            <button onclick="switchTab('poetry-sec')" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all hover:bg-pink-100 text-gray-700">📜 Special Poetry</button>
+            <button onclick="switchTab('contract-sec')" class="tab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all hover:bg-pink-100 text-gray-700">📜 Bestie Contract</button>
+        </nav>
+
+        <!-- SECTION 1: Virtual Hug / Love Meter -->
+        <section id="hug-sec" class="tab-content block">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl text-center relative overflow-hidden shadow-xl">
+                <div class="mb-4">
+                    <span class="text-5xl">🧸💕</span>
+                    <h2 class="text-2xl font-bold text-gray-800 mt-2">Virtual Hug & Love Meter</h2>
+                    <p class="text-xs sm:text-sm text-gray-600">Press & HOLD the button below to fill the love meter with hugs & heart blasts!</p>
+                </div>
+
+                <!-- Progress Bar Container -->
+                <div class="w-full bg-gray-200 h-8 rounded-full overflow-hidden p-1 shadow-inner my-6 relative">
+                    <div id="love-meter-fill" class="h-full bg-gradient-to-r from-pink-400 to-rose-500 rounded-full w-0 transition-all duration-100 flex items-center justify-end pr-3">
+                        <span id="love-meter-text" class="text-xs font-bold text-white tracking-wider">0%</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Hold Button -->
+                <button id="hug-btn" class="w-36 h-36 bg-gradient-to-tr from-pink-500 to-rose-400 hover:from-pink-600 hover:to-rose-500 text-white font-bold rounded-full shadow-2xl flex flex-col items-center justify-center mx-auto active:scale-95 transition-transform duration-100 border-4 border-white cursor-pointer select-none">
+                    <i class="fas fa-heart text-3xl mb-1 animate-ping" style="animation-duration: 2s;"></i>
+                    <span class="text-xs uppercase tracking-wider">HOLD ME!</span>
+                </button>
+
+                <p id="hug-status" class="mt-4 text-sm font-semibold text-pink-600 min-h-[24px]">Hold button to start hugging! 🤗</p>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Digital Scratch Card -->
+        <section id="scratch-sec" class="tab-content hidden">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl text-center shadow-xl flex flex-col items-center">
+                <h2 class="text-2xl font-bold text-gray-800 mb-1">Secret Scratch Surprise! 🎨</h2>
+                <p class="text-xs sm:text-sm text-gray-600 mb-6">Use your finger or mouse to scratch the card below and reveal the secret picture!</p>
+
+                <!-- Scratch Container -->
+                <div class="relative w-72 h-72 rounded-2xl overflow-hidden shadow-2xl border-4 border-white bg-pink-100">
+                    <!-- Revealed Image & Message underneath -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center p-4 bg-gradient-to-b from-pink-100 to-pink-200 text-center">
+                        <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400&auto=format&fit=crop&q=80" alt="Birthday Celebration" class="w-32 h-32 object-cover rounded-full border-4 border-pink-400 shadow-md mb-2">
+                        <h3 class="font-bold text-pink-600 text-lg">You are Amazing! 🎉</h3>
+                        <p class="text-xs text-gray-700">"Friends like Javeria make the world brighter, funnier, and much sweeter! Happy Birthday!"</p>
+                    </div>
+
+                    <!-- Scratch Overlay Canvas -->
+                    <canvas id="scratch-canvas" width="288" height="288" class="absolute inset-0 z-10"></canvas>
+                </div>
+
+                <button onclick="resetScratchCard()" class="mt-6 px-4 py-2 bg-pink-100 text-pink-600 hover:bg-pink-200 rounded-xl text-xs font-bold transition">
+                    <i class="fas fa-redo mr-1"></i> Scratch Again
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Special Poetry -->
+        <section id="poetry-sec" class="tab-content hidden">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl text-center shadow-xl">
+                <span class="text-4xl">🌸✨</span>
+                <h2 class="text-2xl font-bold text-gray-800 my-2">Pyari Javeria Ke Naam 💌</h2>
+                <div class="my-6 p-6 bg-pink-50/80 rounded-2xl border border-pink-200 text-gray-700 space-y-4 font-handwriting text-2xl sm:text-3xl leading-relaxed">
+                    <p>"Har lamha teri muskurahat se mehke,<br>Har din tera khushiyon se behke."</p>
+                    <p>"Dosti ka ye rishta hamesha qaim rahe,<br>Tera har khawab haqeeqat mein badal jaye!"</p>
+                </div>
+                <p class="text-xs text-gray-500 italic">- Special Birthday Shayari from Malika ❤️</p>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Bestie Contract Certificate -->
+        <section id="contract-sec" class="tab-content hidden">
+            <div class="glass-card p-6 sm:p-8 rounded-3xl text-center shadow-xl">
+                <div id="printable-certificate" class="bg-gradient-to-br from-amber-50 via-white to-pink-50 p-8 rounded-2xl border-8 border-double border-pink-400 shadow-2xl relative text-gray-800 my-2">
+                    
+                    <div class="text-center space-y-3">
+                        <span class="text-5xl">👑</span>
+                        <h2 class="text-3xl sm:text-4xl font-bold font-cursive text-pink-600">Official Best Friends Forever Contract</h2>
+                        <p class="text-xs uppercase tracking-widest text-amber-700 font-bold border-b-2 border-amber-200 pb-2 inline-block">Certificate of Lifetime Friendship</p>
+
+                        <p class="text-sm sm:text-base mt-4">This official certificate hereby confirms that</p>
+                        
+                        <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 my-4 font-bold text-xl sm:text-2xl text-pink-600 font-handwriting">
+                            <span class="underline decoration-pink-400 underline-offset-4">Javeria</span>
+                            <span class="text-gray-400 font-sans text-sm">&</span>
+                            <span class="underline decoration-pink-400 underline-offset-4">Malika</span>
+                        </div>
+
+                        <p class="text-xs sm:text-sm text-gray-600 max-w-lg mx-auto leading-relaxed">
+                            Are officially bound by the laws of endless secrets, late-night chats, unconditional support, unlimited laughs, and everlasting love for life!
+                        </p>
+
+                        <!-- Signatures Grid -->
+                        <div class="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-pink-200 text-xs">
+                            <div>
+                                <p class="font-cursive text-2xl text-pink-500 mb-1">Malika</p>
+                                <p class="font-semibold text-gray-500 border-t border-gray-300 pt-1">Bestie Signature</p>
+                            </div>
+                            <div>
+                                <p class="font-cursive text-2xl text-pink-500 mb-1">Javeria</p>
+                                <p class="font-semibold text-gray-500 border-t border-gray-300 pt-1">Birthday Girl</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex justify-center gap-4">
+                    <button onclick="window.print()" class="px-6 py-2.5 bg-pink-500 hover:bg-pink-600 text-white rounded-xl text-xs font-bold shadow-lg transition flex items-center gap-2">
+                        <i class="fas fa-print"></i> Print / Save Certificate
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        // Web Audio API Synth for Birthday Music
+        let audioCtx = null;
+        let isMusicPlaying = false;
+        let musicTimer = null;
+
+        function playBirthdayMelody() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            const notes = [
+                { note: 261.63, duration: 0.3 }, // C4
+                { note: 261.63, duration: 0.3 }, // C4
+                { note: 293.66, duration: 0.6 }, // D4
+                { note: 261.63, duration: 0.6 }, // C4
+                { note: 349.23, duration: 0.6 }, // F4
+                { note: 329.63, duration: 1.0 }, // E4
+                
+                { note: 261.63, duration: 0.3 }, // C4
+                { note: 261.63, duration: 0.3 }, // C4
+                { note: 293.66, duration: 0.6 }, // D4
+                { note: 261.63, duration: 0.6 }, // C4
+                { note: 392.00, duration: 0.6 }, // G4
+                { note: 349.23, duration: 1.0 }, // F4
+            ];
+
+            let step = 0;
+            function playStep() {
+                if (!isMusicPlaying) return;
+                const current = notes[step % notes.length];
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(current.note, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + current.duration - 0.05);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + current.duration);
+
+                step++;
+                musicTimer = setTimeout(playStep, current.duration * 1000);
+            }
+
+            playStep();
+        }
+
+        // Toggle Music
+        document.getElementById('music-toggle-btn').addEventListener('click', () => {
+            isMusicPlaying = !isMusicPlaying;
+            const icon = document.getElementById('music-icon');
+            const text = document.getElementById('music-text');
+
+            if (isMusicPlaying) {
+                icon.classList.add('animate-spin');
+                text.innerText = "Playing Birthday Song 🎵";
+                playBirthdayMelody();
+            } else {
+                icon.classList.remove('animate-spin');
+                text.innerText = "Music Paused ⏸️";
+                if (musicTimer) clearTimeout(musicTimer);
+            }
+        });
+
+        // PIN Lock Handler
+        let currentPin = "";
+        function appendPin(digit) {
+            if (currentPin.length < 4) {
+                currentPin += digit;
+                document.getElementById('pin-input').value = currentPin;
+            }
+        }
+        function clearPin() {
+            currentPin = "";
+            document.getElementById('pin-input').value = "";
+            document.getElementById('pin-error').classList.add('hidden');
+        }
+        function verifyPin() {
+            if (currentPin === "0710") {
+                document.getElementById('pin-screen').style.display = 'none';
+                document.getElementById('main-content').classList.remove('hidden');
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                isMusicPlaying = true;
+                playBirthdayMelody();
+            } else {
+                document.getElementById('pin-error').classList.remove('hidden');
+                clearPin();
+            }
+        }
+
+        // Navigation Tabs Handler
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('bg-pink-500', 'text-white', 'shadow');
+                btn.classList.add('hover:bg-pink-100', 'text-gray-700');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            event.currentTarget.classList.add('bg-pink-500', 'text-white', 'shadow');
+            event.currentTarget.classList.remove('hover:bg-pink-100', 'text-gray-700');
+
+            if (tabId === 'scratch-sec') {
+                initScratchCard();
+            }
+        }
+
+        // Love Meter Hold Logic
+        let holdInterval = null;
+        let progress = 0;
+        const hugBtn = document.getElementById('hug-btn');
+        const fillBar = document.getElementById('love-meter-fill');
+        const fillText = document.getElementById('love-meter-text');
+        const statusText = document.getElementById('hug-status');
+
+        function startHold() {
+            if (holdInterval) clearInterval(holdInterval);
+            holdInterval = setInterval(() => {
+                if (progress < 100) {
+                    progress += 2;
+                    fillBar.style.width = progress + '%';
+                    fillText.innerText = progress + '%';
+                    
+                    // Trigger Heart Blast Confetti at milestones
+                    if (progress % 20 === 0) {
+                        confetti({
+                            particleCount: 15,
+                            spread: 50,
+                            origin: { y: 0.7 },
+                            colors: ['#ff69b4', '#ff1493', '#e91e63']
+                        });
+                    }
+                } else {
+                    clearInterval(holdInterval);
+                    statusText.innerText = "💖 HUG METER 100% FULL! You are Malika's Bestie Forever! 🤗✨";
+                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+                }
+            }, 50);
+        }
+
+        function stopHold() {
+            if (holdInterval) clearInterval(holdInterval);
+            if (progress < 100) {
+                statusText.innerText = "Keep holding to complete the Virtual Hug! 💖";
+            }
+        }
+
+        hugBtn.addEventListener('mousedown', startHold);
+        hugBtn.addEventListener('mouseup', stopHold);
+        hugBtn.addEventListener('mouseleave', stopHold);
+        hugBtn.addEventListener('touchstart', (e) => { e.preventDefault(); startHold(); });
+        hugBtn.addEventListener('touchend', stopHold);
+
+        // Canvas Scratch Card Implementation
+        function initScratchCard() {
+            const canvas = document.getElementById('scratch-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#f472b6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = 'bold 18px Poppins';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.fillText('Scratch Here Bestie! ✨', canvas.width / 2, canvas.height / 2);
+
+            let isScratching = false;
+
+            function scratch(e) {
+                if (!isScratching) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            canvas.addEventListener('mousedown', () => isScratching = true);
+            canvas.addEventListener('mouseup', () => isScratching = false);
+            canvas.addEventListener('mousemove', scratch);
+
+            canvas.addEventListener('touchstart', (e) => { isScratching = true; scratch(e); });
+            canvas.addEventListener('touchend', () => isScratching = false);
+            canvas.addEventListener('touchmove', scratch);
+        }
+
+        function resetScratchCard() {
+            initScratchCard();
+        }
+
+        // Floating Balloons Generator
+        const balloonColors = ['🎈', '🌸', '💖', '✨', '🎂'];
+        const balloonContainer = document.getElementById('balloon-container');
+
+        function createBalloon() {
+            const balloon = document.createElement('div');
+            balloon.className = 'floating-balloon text-3xl sm:text-4xl';
+            balloon.innerText = balloonColors[Math.floor(Math.random() * balloonColors.length)];
+            balloon.style.left = Math.random() * 90 + 'vw';
+            balloon.style.animationDuration = (Math.random() * 6 + 8) + 's';
+
+            balloon.addEventListener('click', () => {
+                confetti({
+                    particleCount: 25,
+                    origin: { x: parseFloat(balloon.style.left) / 100, y: 0.5 }
+                });
+                balloon.remove();
+            });
+
+            balloonContainer.appendChild(balloon);
+
+            setTimeout(() => {
+                if (balloon.parentNode) balloon.remove();
+            }, 14000);
+        }
+
+        setInterval(createBalloon, 1500);
+    </script>
+</body>
+</html>
